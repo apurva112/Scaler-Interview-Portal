@@ -5,7 +5,7 @@ const Header = () => {
     const navigate = useNavigate();
     const createInterview = (e) => {
         e.preventDefault();
-        navigate('/createInterview', {state: {data: {}, edit: false}, });
+        navigate('/interviewForm', {state: {data: {}, edit: false}, });
     }
 
     return(

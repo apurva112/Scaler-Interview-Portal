@@ -12,7 +12,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home/>}></Route>
-          <Route path="/createInterview" element={<InterviewForm/>}></Route>
+          <Route path="/interviewForm" element={<InterviewForm/>}></Route>
         </Routes>
       </BrowserRouter>
     </React.Fragment>

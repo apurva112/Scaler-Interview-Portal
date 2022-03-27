@@ -1,12 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 import styles from './interviewCard.module.css';
 
 const InterviewCard = (props) => {
+    const navigate = useNavigate();
 
-    props.interview.participants.forEach((e) => {
-        console.log(e.name);
-    })
+    const editHandler = (e) => {
+        e.preventDefault();
+        navigate('/interviewForm', {state: {data: props.interview, edit: true}, });
+    }
 
     return (
         <div className={styles.card}>
@@ -16,6 +19,7 @@ const InterviewCard = (props) => {
             {props.interview.participants.map((element) => {
                 return <p>{element.name}</p>
             })}
+            <button onClick={editHandler}>Edit</button>
         </div>
     );
 }

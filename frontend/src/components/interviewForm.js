@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react"; 
+import { useNavigate, useLocation } from "react-router-dom";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
 import classes from './interviewForm.module.css'
 
 const InterviewForm = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const [participantData, setParticipantData] = useState([]);
     const [selectedParticipants, setSelectedParticipants] = useState([]);
+    const [defaultValues, setDefaultValues] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const [title, setTitle] = useState('');
@@ -23,6 +28,19 @@ const InterviewForm = () => {
             setIsLoading(false);
         });
     }, []);
+
+    useEffect(() => {
+        if(location.state.edit) {
+            setTitle(location.state.data.title);
+            setStartTime(location.state.data.startTime.slice(0,16));
+            setEndTime(location.state.data.endTime.slice(0,16));
+            const options = [];
+            for(let d of location.state.data.participants) {
+                options.push({label: d.name, value: d._id});
+            }
+            setDefaultValues(options);
+        }
+    }, [])
 
     const getOptions = (data) => {
         const options = [];
@@ -52,24 +70,46 @@ const InterviewForm = () => {
 
         console.log(data);
 
-        const url = "http://localhost:8080/api/v1/interview/";
+        let url = "http://localhost:8080/api/v1/interview/";
         
-        try {
-            const rawResponse = await fetch(url, {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json"
-                },
-                body: data,
-                crossDomain: true,
-            });
-            const response = await rawResponse.json();
-            console.log(response);
-
-        } catch (error) {
-            
+        if(location.state.edit) {
+            try {
+                url = url + location.state.data._id;
+                const rawResponse = await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: data,
+                    crossDomain: true,
+                });  
+                const response = await rawResponse.json();
+                if(rawResponse.status && (rawResponse.status === 400 || rawResponse === 500)) alert(response.msg);
+    
+            } catch (error) {
+                
+            }
+        } else {
+            try {
+                const rawResponse = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: data,
+                    crossDomain: true,
+                });
+                const response = await rawResponse.json();
+                console.log(response);
+    
+            } catch (error) {
+                
+            }
         }
+        navigate('/', {state: {} } );
+        
     }
 
     return (
@@ -77,21 +117,22 @@ const InterviewForm = () => {
             {!isLoading && <form>
                 <label for="title">
                     Title 
-                    <input  type="text" id="title" name="title" onChange={event => setTitle(event.target.value)}></input>
+                    <input  type="text" id="title" name="title" value={title} onChange={event => setTitle(event.target.value)}></input>
                 </label><br />
 
                 <label for="startTime">
                     Start time 
-                    <input  type="datetime-local" id="startTime" name="startTime" onChange={event => setStartTime(event.target.value)}></input>
+                    <input  type="datetime-local" id="startTime" name="startTime" value={startTime} onChange={event => setStartTime(event.target.value)}></input>
                 </label><br />
 
                 <label for="endTime">
-                    End Time<input type="datetime-local" id="endTime" name="endTime" onChange={event => setEndTime(event.target.value)}></input>
+                    End Time<input type="datetime-local" id="endTime" name="endTime" value={endTime} onChange={event => setEndTime(event.target.value)}></input>
                 </label><br/>
 
                 <label for="participants">
                     Select Participants
                     <Select
+                        defaultValue={defaultValues}
                         isMulti
                         closeManeOnSelect={false}
                         components={animatedComponents}
@@ -104,7 +145,7 @@ const InterviewForm = () => {
                         }}
                     />
                 </label> <br />
-                <button onClick={onSubmitHandler}>create</button>
+                <button onClick={onSubmitHandler}>{location.state.edit ? <p>Edit</p>: <p>Create</p>}</button>
             </form>}
         </div>
     );

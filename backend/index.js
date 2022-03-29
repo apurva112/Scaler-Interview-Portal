@@ -10,7 +10,7 @@ const dburl = 'mongodb+srv://mongo:mongo@cluster0.e50uq.mongodb.net/myFirstDatab
 mongoose.connect(dburl);
 mongoose.connection.on('error', err => {console.log(err)});
 mongoose.connection.once('open', () => {
-    console.log('Database Connected on ');
+    console.log('Database Connected');
 })
 
 const app = express();
@@ -20,7 +20,7 @@ app.use(express.json())
 app.use('/api/v1/interview', interviewRoutes)
 app.use('/api/v1/participant', participantRoutes)
 app.use('*', (req,res,next)=> {
-    next(new CustomError('Invalid Error', 404))
+    next(new CustomError('Invalid Request Error', 404))
 })
 app.use((err, req, res, next)=> {
     console.log(err);

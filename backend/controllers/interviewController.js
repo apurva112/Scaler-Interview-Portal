@@ -48,6 +48,3 @@ module.exports.editInterview = async(req, res, next) => {
         return next(err);
     }
 }
-
-
-

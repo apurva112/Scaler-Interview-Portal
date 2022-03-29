@@ -20,7 +20,7 @@ const Schema = mongoose.Schema;
     endTime: { 
         type: Date, 
         default: Date.now 
-    },    
+    },  
     status: {
         type: Number,
         default: 0,
